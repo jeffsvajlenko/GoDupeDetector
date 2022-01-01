@@ -1,4 +1,4 @@
-FROM alpine:latest 
-WORKDIR / 
-ADD bin /bin/ 
+FROM alpine:latest
+WORKDIR /
+ADD bin /bin/
 CMD ["/bin/goduped"]
