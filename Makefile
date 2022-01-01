@@ -7,4 +7,4 @@ vet:
 	go vet ./...
 
 build:
-	go build -o bin/ ./cmd/goduped.go
+	go build -o bin/goduped  ./main.go
