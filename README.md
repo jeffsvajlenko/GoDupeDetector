@@ -13,4 +13,4 @@ GoDupedDetector is in early development, and currently only detects go functions
 - [ ] Clustering of clone pairs into clone classes.
 - [ ] Alternate input specifications, such as file lists.
 - [ ] Alternate output formats.
-- ...
+- [ ] Release as a brew tap.
