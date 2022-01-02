@@ -23,10 +23,8 @@ var detectCmd = &cobra.Command{
 	Short: "Runs clone detection.",
 	Long:  `Runs clone detection.`,
 	RunE: func(cmd *cobra.Command, args []string) error {
-
+		// Handle input folder
 		input, _ := cmd.Flags().GetString("input")
-		output, _ := cmd.Flags().GetString("output")
-
 		finfo, _ := os.Stat(input)
 		if finfo == nil {
 			return errors.New("input directory does not exist or is invalid")
@@ -35,9 +33,11 @@ var detectCmd = &cobra.Command{
 			return errors.New("input must be a directory")
 		}
 
+		// Handle output file
+		output, _ := cmd.Flags().GetString("output")
 		finfo, _ = os.Stat(output)
-		if finfo != nil {
-			return errors.New("output file already exists or is a directory")
+		if finfo != nil && finfo.IsDir() {
+			return errors.New("output exists and is a directory")
 		}
 		outf, err := os.Create(output)
 		if err != nil {
@@ -45,6 +45,13 @@ var detectCmd = &cobra.Command{
 		}
 		defer outf.Close()
 
+		// Handle threshold
+		threshold, _ := cmd.Flags().GetFloat64("threshold")
+		if threshold < 0.0 || threshold > 1.0 {
+			return errors.New("threshold needs to be a value between 0.0 and 1.0")
+		}
+
+		// Get go files
 		fmt.Print("Collecting go files...")
 		files, err := parsing.FileList(input)
 		if err != nil {
@@ -52,38 +59,31 @@ var detectCmd = &cobra.Command{
 		}
 		fmt.Printf(" %d files collected.\n", len(files))
 
+		// Parse code files
 		fmt.Print("Parsing...")
 		pset, _ := parsing.Parse(files)
 		fmt.Println(" Done!")
 
+		// Detect clones
 		fmt.Print("Detecting...")
 		cset, _ := detection.DetectClones(pset, 0.70)
 		fmt.Printf(" %d clones detected.\n", len(cset.Clones))
 
+		// Output clones
 		fmt.Println("Outputting...")
 		bout := bufio.NewWriter(outf)
 		err = printer.PrintCloneReport(pset, cset, bout)
-
 		if err != nil {
 			log.Fatal(err)
 		}
 
+		// Made it without error!
 		return nil
 	},
 }
 
 func init() {
 	rootCmd.AddCommand(detectCmd)
-
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// detectCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// detectCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 	detectCmd.Flags().String("input", "", "Input source folder.")
 	detectCmd.MarkFlagRequired("input")
 	detectCmd.Flags().String("output", "", "Output report file.")
