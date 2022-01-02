@@ -27,21 +27,21 @@ var detectCmd = &cobra.Command{
 		input, _ := cmd.Flags().GetString("input")
 		output, _ := cmd.Flags().GetString("output")
 
-		finfo, err := os.Stat(input)
+		finfo, _ := os.Stat(input)
 		if finfo == nil {
-			return errors.New("Input directory does not exist or is invalid.")
+			return errors.New("input directory does not exist or is invalid")
 		}
 		if !finfo.IsDir() {
-			return errors.New("Input must be a directory.")
+			return errors.New("input must be a directory")
 		}
 
-		finfo, err = os.Stat(output)
+		finfo, _ = os.Stat(output)
 		if finfo != nil {
-			return errors.New("Output file already exists or is a directory.")
+			return errors.New("output file already exists or is a directory")
 		}
 		outf, err := os.Create(output)
 		if err != nil {
-			return fmt.Errorf("Failed to create output file with error: %s", err.Error())
+			return fmt.Errorf("failed to create output file with error: %s", err.Error())
 		}
 		defer outf.Close()
 
@@ -88,4 +88,5 @@ func init() {
 	detectCmd.MarkFlagRequired("input")
 	detectCmd.Flags().String("output", "", "Output report file.")
 	detectCmd.MarkFlagRequired("output")
+	detectCmd.Flags().Float64("threshold", 0.70, "Minimum similarity threshold for reported clones.")
 }
