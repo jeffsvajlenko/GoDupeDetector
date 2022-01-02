@@ -3,9 +3,6 @@ GoDupeDetector (goduped) is a code lcone detection tool for go written in go.  I
 
 GoDupedDetector is in early development, and currently only detects go functions/methods with similar bodies.
 
-# Version History
-v0.0.1 - Base implementation 
-
 # Features in Planning
 - [ ] Identifier and literal value normalizations for improved near-miss detection.
 - [ ] Function signature and type/interface-based detection for functional clone detection.
