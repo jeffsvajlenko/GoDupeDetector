@@ -1,5 +1,5 @@
 # GoDupeDetector
-GoDupeDetector (goduped) is a code lcone detection tool for go written in go.  It utilizes the standard library for most accurate parsing of go source code.  Detection is performed by applying the longest-common-subsequence algorithm on normalized and pretty-printed source code, and reporting those code fragments meeting a minimum threshold of identical source lines.
+GoDupeDetector (goduped) is a code clone detection tool for go written in go.  It utilizes the standard library for most accurate parsing of go source code.  Detection is performed by applying the longest-common-subsequence algorithm on normalized and pretty-printed source code, and reporting those code fragments meeting a minimum threshold of identical source lines.
 
 GoDupedDetector is in early development, and currently only detects go functions/methods with similar bodies.
 
