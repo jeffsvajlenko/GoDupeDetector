@@ -7,6 +7,7 @@ import (
 	"go/printer"
 	"go/token"
 	"io/fs"
+	"log"
 	"path/filepath"
 	"strings"
 	"sync"
@@ -36,6 +37,7 @@ type Function struct {
 	StartColumn     uint
 	EndLine         uint
 	EndColumn       uint
+	LineLength      uint
 	Name            string
 	Params          []Param
 	Results         []Param
@@ -87,10 +89,19 @@ func Parse(files []string) (*ParseSet, error) {
 
 		go func(file File, cfunc chan Function) {
 			defer wg.Done()
+			defer func() {
+				if perr := recover(); perr != nil {
+					log.Println("parsing failed for file", file.Path)
+				}
+			}()
 
-			functions, _ := parsefile(file, parseSet.FileSet, &parseSet.Strings)
-			for _, function := range functions {
-				cfunc <- function
+			functions, errs := parseFile(file, parseSet.FileSet, &parseSet.Strings)
+			if len(errs) > 0 {
+				log.Println("prasing failed for file", file)
+			} else {
+				for _, function := range functions {
+					cfunc <- function
+				}
 			}
 		}(file, cfunc)
 	}
@@ -105,7 +116,7 @@ func Parse(files []string) (*ParseSet, error) {
 	return &parseSet, nil
 }
 
-func parsefile(file File, fset *token.FileSet, intern *sync.Map) ([]Function, []error) {
+func parseFile(file File, fset *token.FileSet, intern *sync.Map) ([]Function, []error) {
 	retval := make([]Function, 0, 10)
 
 	errors := make([]error, 0, 1)
@@ -163,6 +174,7 @@ func parsefile(file File, fset *token.FileSet, intern *sync.Map) ([]Function, []
 				StartColumn:     uint(startPosition.Column),
 				EndLine:         uint(endPosition.Line),
 				EndColumn:       uint(endPosition.Column),
+				LineLength:      uint(endPosition.Line - startPosition.Line + 1),
 				Name:            d.Name.Name,
 				Params:          params,
 				Results:         results,

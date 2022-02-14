@@ -44,10 +44,12 @@ func DetectClones(pset *parsing.ParseSet, threshold float64) (*CloneSet, error) 
 
 			for j := i + 1; j < len(functions); j++ {
 				f2 := functions[j]
-				if isClone(f1, f2, threshold) {
-					cclones <- Clone{
-						FunctionId1: f1.Id,
-						FunctionId2: f2.Id,
+				if math.Ceil(math.Max(float64(f1.LineLength), float64(f2.LineLength))*threshold) > math.Min(float64(f1.LineLength), float64(f1.LineLength)) {
+					if isClone(f1, f2, threshold) {
+						cclones <- Clone{
+							FunctionId1: f1.Id,
+							FunctionId2: f2.Id,
+						}
 					}
 				}
 			}
