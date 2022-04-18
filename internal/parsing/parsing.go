@@ -184,7 +184,6 @@ func parseFile(file File, fset *token.FileSet, intern *sync.Map) ([]Function, []
 			})
 		}
 	}
-
 	return retval, errors
 }
 
